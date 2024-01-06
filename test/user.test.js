@@ -36,8 +36,8 @@ describe("register user", () => {
       });
 
     expect(result.status).toBe(400);
-    expect(result.body.error).toBeDefined();
-    logger.info(result.body.error);
+    expect(result.body.errors).toBeDefined();
+    logger.info(result.body.errors);
   });
 });
 
@@ -54,8 +54,43 @@ describe("login user", () => {
       password: "rahasia",
     });
 
-    expect(result.status).toBe(200)
+    expect(result.status).toBe(200);
     expect(result.body.data.token).toBeDefined();
     // logger.error(result)
+  });
+});
+
+describe("user get api", () => {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("get api user", async () => {
+    const user = await supertest(web)
+      .get("/api/users/current")
+      .set("Authorization", "test");
+
+    expect(user.status).toBe(200);
+    expect(user.body.data.username).toBe("test");
+  });
+
+  it("jika ga ada token", async () => {
+    const user = await supertest(web)
+      .get("/api/users/current")
+      .set("Authorization", "");
+
+    expect(user.status).toBe(401);
+    expect(user.body.errors).toBeDefined();
+  });
+  it("jika ga ada authorization", async () => {
+    const user = await supertest(web)
+      .get("/api/users/current")
+      
+
+    expect(user.status).toBe(401);
+    expect(user.body.errors).toBeDefined();
   });
 });
