@@ -86,11 +86,62 @@ describe("user get api", () => {
     expect(user.body.errors).toBeDefined();
   });
   it("jika ga ada authorization", async () => {
-    const user = await supertest(web)
-      .get("/api/users/current")
-      
+    const user = await supertest(web).get("/api/users/current");
 
     expect(user.status).toBe(401);
     expect(user.body.errors).toBeDefined();
   });
+});
+
+describe("update user api patch /api/users/current", () => {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+  afterEach(async () => {
+    await removeTestUser();
+  });
+  it("update success", async () => {
+    const newUser = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test")
+      .send({
+        password: "slebew",
+        name: "kuntuludin",
+      });
+
+    expect(newUser.status).toBe(200);
+    expect(newUser.body.data.name).toBe("kuntuludin");
+    expect(newUser.body.data.username).toBe("test");
+  });
+});
+it("update vailed no data", async () => {
+  const newUser = await supertest(web)
+    .patch("/api/users/current")
+    .set("Authorization", "test")
+    .send({
+      password: "",
+      name: "",
+    });
+
+  expect(newUser.status).toBe(400);
+  expect(newUser.body.errors).toBeDefined();
+  console.log(newUser.body.errors);
+  // expect(newUser.body.data.name).toBe("kuntuludin");
+  // expect(newUser.body.data.username).toBe("test");
+});
+
+it("update vailed no authorixation", async () => {
+  const newUser = await supertest(web)
+    .patch("/api/users/current")
+    .set("Authorization", "salah")
+    .send({
+      password: "",
+      name: "",
+    });
+
+  expect(newUser.status).toBe(401);
+  expect(newUser.body.errors).toBeDefined();
+  console.log(newUser.body.errors);
+  // expect(newUser.body.data.name).toBe("kuntuludin");
+  // expect(newUser.body.data.username).toBe("test");
 });
