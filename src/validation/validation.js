@@ -1,15 +1,15 @@
 import { ResponseError } from "../error/response-error.js";
 
-export const validate = (schema, request) => {
+const MyValidate = (schema, request) => {
   const result = schema.validate(request, {
     abortEarly: false,
-    allowUnknown: false
-})
-if (result.error) {
+    allowUnknown: false,
+  });
+  if (result.error) {
     throw new ResponseError(400, result.error.message);
-} else {
+  } else {
     return result.value;
-}
+  }
 };
 
-export { validate };
+export { MyValidate };
