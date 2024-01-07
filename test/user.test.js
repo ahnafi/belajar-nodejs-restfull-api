@@ -1,4 +1,4 @@
-import { removeTestUser, createTestUser } from "./utils.test.js";
+import { removeTestUser, createTestUser, getTestUser } from "./utils.test.js";
 import supertest from "supertest";
 import { web } from "../src/app/web.js";
 import { prisma } from "../src/app/database.js";
@@ -113,35 +113,108 @@ describe("update user api patch /api/users/current", () => {
     expect(newUser.body.data.name).toBe("kuntuludin");
     expect(newUser.body.data.username).toBe("test");
   });
+
+  it("update vailed no data", async () => {
+    const newUser = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test")
+      .send({
+        password: "",
+        name: "",
+      });
+
+    expect(newUser.status).toBe(400);
+    expect(newUser.body.errors).toBeDefined();
+    console.log(newUser.body.errors);
+    // expect(newUser.body.data.name).toBe("kuntuludin");
+    // expect(newUser.body.data.username).toBe("test");
+  });
+
+  it("update vailed no authorixation", async () => {
+    const newUser = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "salah")
+      .send({
+        password: "",
+        name: "",
+      });
+
+    expect(newUser.status).toBe(401);
+    expect(newUser.body.errors).toBeDefined();
+    console.log(newUser.body.errors);
+    // expect(newUser.body.data.name).toBe("kuntuludin");
+    // expect(newUser.body.data.username).toBe("test");
+  });
 });
-it("update vailed no data", async () => {
-  const newUser = await supertest(web)
-    .patch("/api/users/current")
-    .set("Authorization", "test")
-    .send({
-      password: "",
-      name: "",
-    });
 
-  expect(newUser.status).toBe(400);
-  expect(newUser.body.errors).toBeDefined();
-  console.log(newUser.body.errors);
-  // expect(newUser.body.data.name).toBe("kuntuludin");
-  // expect(newUser.body.data.username).toBe("test");
+describe("logout user api", () => {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should logout success", async () => {
+    let user = await getTestUser();
+    console.log(user.token);
+
+    const logout = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "test");
+
+    user = await getTestUser();
+    console.log(user.token);
+
+    expect(logout.status).toBe(200);
+    expect(logout.body.data).toBe("OK");
+  });
+
+  it("should logout error no authorized", async () => {
+    let user = await getTestUser();
+    console.log(user.token);
+
+    const logout = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "");
+
+    user = await getTestUser();
+    console.log(user.token);
+
+    expect(logout.status).toBe(401);
+    expect(logout.body.data).toBeUndefined();
+    expect(logout.body.errors).toBeDefined();
+  });
+  it("should logout error no token false", async () => {
+    let user = await getTestUser();
+    console.log(user.token);
+
+    const logout = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "konsol");
+
+    user = await getTestUser();
+    console.log(user.token);
+
+    expect(logout.status).toBe(401);
+    expect(logout.body.data).toBeUndefined();
+    expect(logout.body.errors).toBeDefined();
+  });
+  it("should logout error no header", async () => {
+    let user = await getTestUser();
+    console.log(user.token);
+
+    const logout = await supertest(web).delete("/api/users/logout");
+
+    user = await getTestUser();
+    console.log(user.token);
+
+    expect(logout.status).toBe(401);
+    expect(logout.body.data).toBeUndefined();
+    expect(logout.body.errors).toBeDefined();
+  });
 });
 
-it("update vailed no authorixation", async () => {
-  const newUser = await supertest(web)
-    .patch("/api/users/current")
-    .set("Authorization", "salah")
-    .send({
-      password: "",
-      name: "",
-    });
-
-  expect(newUser.status).toBe(401);
-  expect(newUser.body.errors).toBeDefined();
-  console.log(newUser.body.errors);
-  // expect(newUser.body.data.name).toBe("kuntuludin");
-  // expect(newUser.body.data.username).toBe("test");
+test("should test logger", () => {
+  logger.info("test log ============================");
 });

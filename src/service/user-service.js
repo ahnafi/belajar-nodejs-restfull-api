@@ -5,6 +5,7 @@ import {
   loginUserValidation,
   getUserValidation,
   updateUserValidation,
+  logoutUserValidation,
 } from "../validation/user-validation.js";
 import bcrypt from "bcrypt";
 import { MyValidate } from "../validation/validation.js";
@@ -134,4 +135,27 @@ const update = async (request) => {
   });
 };
 
-export default { register, login, get, update };
+const logout = async (username) => {
+  // check
+  username = MyValidate(logoutUserValidation, username);
+  //
+  const user = prisma.user.findUnique({
+    where: {
+      username: username,
+    },
+    select: {
+      username: true,
+    },
+  });
+  if (!user) {
+    throw new ResponseError(404, "user is not found");
+  }
+  // remove token
+  return prisma.user.update({
+    where: { username: username },
+    data: { token: null },
+    select: { username: true },
+  });
+};
+
+export default { register, login, get, update, logout };

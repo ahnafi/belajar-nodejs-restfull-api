@@ -2,6 +2,7 @@ import { prisma } from "../src/app/database.js";
 import bcrypt from "bcrypt";
 
 export const removeTestUser = async () => {
+  console.log("============================");
   await prisma.user.deleteMany({
     where: {
       username: "test",
@@ -10,6 +11,8 @@ export const removeTestUser = async () => {
 };
 
 export const createTestUser = async () => {
+  console.log("============================");
+
   await prisma.user.create({
     data: {
       username: "test",
@@ -21,6 +24,8 @@ export const createTestUser = async () => {
 };
 
 export const getTestUser = async () => {
+  console.log("============================");
+
   return prisma.user.findUnique({
     where: {
       username: "test",
