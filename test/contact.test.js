@@ -159,3 +159,52 @@ describe("PUT /api/contacts/:contactId", function () {
     expect(result.status).toBe(404);
   });
 });
+
+describe("remove contact", () => {
+  beforeEach(async () => {
+    await createTestUser();
+    await createTestContact();
+  });
+
+  afterEach(async () => {
+    await removeAllTestContacts();
+    await removeTestUser();
+  });
+
+  it("should can remove existing contact", async () => {
+    let testContact = await getTestContact();
+
+    const result = await supertest(web)
+      .delete("/api/contacts/" + testContact.id)
+      .set("Authorization", "test");
+
+    testContact = await getTestContact();
+
+    expect(result.status).toBe(200);
+    console.log(result.body);
+  });
+
+  it("id error", async () => {
+    let testContact = await getTestContact();
+
+    const result = await supertest(web)
+      .delete("/api/contacts/" + (testContact.id + 1))
+      .set("Authorization", "test");
+
+    testContact = await getTestContact();
+
+    expect(result.status).toBe(404);
+    logger.error(result.errors);
+  });
+  it("un authorized", async () => {
+    let testContact = await getTestContact();
+
+    const result = await supertest(web)
+      .delete("/api/contacts/" + testContact.id)
+      .set("Authorization", "konsol");
+
+    testContact = await getTestContact();
+
+    expect(result.status).toBe(401);
+  });
+});
