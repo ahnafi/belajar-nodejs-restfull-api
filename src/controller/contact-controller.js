@@ -27,7 +27,23 @@ const get = async (req, res, next) => {
   }
 };
 
+const update = async (req, res, next) => {
+  try {
+    const username = req.user.username;
+    const newData = req.body;
+    const contactId = req.params.contactId;
+    newData.id = contactId;
+    const contact = await contactService.update(username, newData);
+    res.status(200).json({
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   create,
   get,
+  update,
 };
