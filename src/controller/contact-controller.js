@@ -14,6 +14,20 @@ const create = async (req, res, next) => {
   }
 };
 
+const get = async (req, res, next) => {
+  try {
+    const username = req.user.username;
+    const contactId = req.params.contactId;
+    const contact = await contactService.get(username, contactId);
+    res.status(200).json({
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   create,
+  get,
 };

@@ -45,8 +45,8 @@ export const createTestContact = async () => {
   await prisma.contact.create({
     data: {
       username: "test",
-      first_name: "test",
-      last_name: "test",
+      firstName: "test",
+      lastName: "test",
       email: "test@pzn.com",
       phone: "080900000",
     },
@@ -58,8 +58,8 @@ export const createManyTestContacts = async () => {
     await prisma.contact.create({
       data: {
         username: `test`,
-        first_name: `test ${i}`,
-        last_name: `test ${i}`,
+        firstName: `test ${i}`,
+        lastName: `test ${i}`,
         email: `test${i}@pzn.com`,
         phone: `080900000${i}`,
       },

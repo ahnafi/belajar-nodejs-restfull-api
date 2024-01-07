@@ -10,6 +10,7 @@ export const authMiddleware = async (req, res, next) => {
       })
       .end();
   } else {
+    // validate user
     const user = await prisma.user.findFirst({
       where: {
         token: token,
