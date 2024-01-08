@@ -94,7 +94,7 @@ export const createTestAddress = async () => {
       city: "kota test",
       province: "provinsi test",
       country: "indonesia",
-      postal_code: "234234",
+      postalCode: "234234",
     },
   });
 };

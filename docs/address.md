@@ -29,7 +29,7 @@ Response Body Success :
     "city" : "Kota apa",
     "province" : "Provinsi apa",
     "country" : "Negara apa",
-    "postal_code" : "Kode pos"
+    "postalCode" : "Kode pos"
   }
 }
 ```
