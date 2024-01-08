@@ -3,6 +3,7 @@ import { ResponseError } from "../error/response-error.js";
 import {
   createContactValidation,
   getContactValidation,
+  searchContactValidation,
   updateContactValidation,
 } from "../validation/contact-validation.js";
 import { MyValidate } from "../validation/validation.js";
@@ -93,7 +94,7 @@ const remove = async (username, contactId) => {
       id: contactId,
     },
   });
-  
+
   if (count !== 1) {
     throw new ResponseError(404, "Contact not found");
   }
@@ -105,9 +106,61 @@ const remove = async (username, contactId) => {
   });
 };
 
+const search = async (username, request) => {
+  request = MyValidate(searchContactValidation, request);
+
+  const skip = (request.page - 1) * request.size;
+
+  const filters = [];
+
+  filters.push({ username });
+
+  if (request.name)
+    filters.push({
+      OR: [
+        {
+          firstName: {
+            contains: request.name,
+          },
+        },
+        {
+          lastName: {
+            contains: request.name,
+          },
+        },
+      ],
+    });
+  if (request.email) filters.push({ email: { contains: request.email } });
+  if (request.phone) filters.push({ phone: { contains: request.phone } });
+
+  const contact = await prisma.contact.findMany({
+    where: {
+      AND: filters,
+    },
+    take: request.size,
+    skip: skip,
+  });
+
+  const count = await prisma.contact.count({
+    where: {
+      AND: filters,
+    },
+  });
+
+  return {
+    data: contact,
+    paging: {
+      page: request.page,
+      total_item: count,
+      total_page: Math.ceil(count / request.size),
+    },
+  };
+};
+
 export default {
   create,
   remove,
   get,
   update,
+  search,
 };

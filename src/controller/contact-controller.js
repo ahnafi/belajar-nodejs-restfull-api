@@ -47,9 +47,30 @@ const remove = async (req, res, next) => {
     const username = req.user.username;
     const contactId = req.params.contactId;
     await contactService.remove(username, contactId);
-    
+
     res.status(200).json({
       data: "OK",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const search = async (req, res, next) => {
+  try {
+    const username = req.user.username;
+    const request = {
+      name: req.query.name,
+      email: req.query.email,
+      phone: req.query.phone,
+      size: req.query.size,
+      page: req.query.page,
+    };
+    const result = await contactService.search(username, request);
+
+    res.status(200).json({
+      data: result.data,
+      paging: result.paging,
     });
   } catch (error) {
     next(error);
@@ -61,4 +82,5 @@ export default {
   get,
   update,
   remove,
+  search,
 };
