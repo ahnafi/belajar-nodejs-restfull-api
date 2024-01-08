@@ -1,6 +1,10 @@
 import { prisma } from "../src/app/database.js";
 import bcrypt from "bcrypt";
 
+test('should test', () => {
+  // console.log("test ready")
+});
+
 export const removeTestUser = async () => {
   console.log("============================");
   await prisma.user.deleteMany({
